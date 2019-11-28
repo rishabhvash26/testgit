@@ -1,0 +1,19 @@
+.THIS .metro{
+    background-color:#1b5297;
+    color:white;
+}
+.THIS .slds-card__header{
+    margin:0;
+   
+}
+.THIS .pointer{
+    cursor: pointer;
+    
+}
+.THIS .metro:hover{
+    background-color: #007FFF	;
+}
+.THIS .header_label{
+    font-weight:;
+    font-size:1rem;
+}

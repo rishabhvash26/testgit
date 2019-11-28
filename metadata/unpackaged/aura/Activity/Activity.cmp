@@ -1,0 +1,156 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" controller="ActivityController" access="global" >
+    <aura:Attribute name="todaytasklist" type="list"/>
+    <aura:Attribute name="overduetasklist" type="list"/>
+    <!-- @description contains all records data.-->
+    <aura:attribute name="allRecords" type="List"/>
+     <!--@description contains pageSize i.e no of records to show on a page in pagination.-->
+    <aura:attribute name="pageSize" type="Integer" default="3"/>
+     <!--@description contains pageNumber of current page.-->
+    <aura:attribute name="pageNumber" type="Integer" default="0"/>
+      <!--@description contains list of records after applying pagination.-->
+    <aura:attribute name="paginationList" type="List" default="[]"/>
+    <!--@description contains integer value of total number of pages shown in a datatable.-->
+     <aura:attribute name="totalPages" type="Integer" default="0"/>
+    <!-- @description contains total number of customer records.-->
+    <aura:attribute name="dataSize" type="Integer" default="0"/> 
+    <!--@description Boolean attribute to check for last page in pagination.-->
+    <aura:attribute name="isLastPage" type="Boolean" default="false"/>
+    <aura:Attribute name="completedtasklist" type="list"/>
+    <aura:handler event="force:navigateToSObject" action="{!c.navigateToRecord}"/>
+    <aura:handler name="init" value="{! this}" action="{!c.doInit}"/>
+<div class="slds-card">
+    <header class="slds-card__header slds-grid slds-p-left_x-small">
+    <div class="slds-media slds-media_center slds-has-flexi-truncate">
+        <div class="slds-media__figure">
+            <lightning:icon iconName="standard:task" alternativeText="Approved"/>
+        </div>
+        <div class="slds-media__body slds-truncate">
+            <h2>
+            <span class="header_label">
+            My Tasks
+            </span>
+                </h2>
+        </div>
+        </div>
+    </header>
+    <div class="slds-card__body">
+    <div class="slds-grid pointer">
+        <div onclick="{!c.todayTaskTab}"  class="slds-col metro  slds-m-right_xx-small slds-m-left_xx-small"><span class="slds-align_absolute-center">Today's Task</span></div>
+        <div onclick="{!c.overdueTaskTab}" class="slds-col metro  "><span class="slds-align_absolute-center">Overdue Task</span></div>
+        <div onclick="{!c.completedTaskTab}" class="slds-col metro slds-m-right_xx-small slds-m-left_xx-small "><span class="slds-align_absolute-center">Completed Task</span></div>
+        </div>
+        <div aura:id="TodayTabDataId" id="tab-default-1" class=" slds-show slds-p-left_x-small" role="tabpanel" aria-labelledby="Fruits_linking">
+        
+<!--lightning:listView
+    objectApiName="Task"
+    listName="test1"
+    rows="5"
+    showSearchBar="true"
+    showActionBar="true"
+    enableInlineEdit="true"
+    showRowLevelActions="false"
+/-->          
+          <aura:iteration items="{!v.todaytasklist}" var="item">
+          <div class="demo-only slds-m-top_small">
+  <article class="slds-tile slds-size_1-of-1 slds-border_bottom">
+    <h3 class="slds-tile__title slds-truncate" title="Salesforce UX">
+        {!item.OwnerId.Name}
+        <a href="{!'/lightning/r/Task/'+item.Id+'/view'}" target="_blank">{!item.Subject}</a>
+    </h3>
+    <div class="slds-tile__detail">
+      <dl class="slds-list_horizontal slds-wrap">
+        <dt class="slds-item_label slds-text-color_weak slds-truncate" title="First Label"><a href="{!'lightning/r/User/'+item.AccountId+'/view'}" target="_blank">{!item.Account.Name}</a></dt>
+        <!--dd class="slds-item_detail slds-truncate" title="Description for first label">Description for first label</dd-->
+        <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Second Label"><a href="{!'/lightning/r/Task/'+item.OwnerId+'/view'}" target="_blank">{!item.Owner.Name}</a></dt>
+        <!--dd class="slds-item_detail slds-truncate" title="Description for second label">Description for second label</dd-->
+      </dl>
+    </div>
+  </article>
+</div>
+          </aura:iteration>
+      </div>
+      <div aura:id="OverdueTabDataId" id="tab-default-2" class=" slds-p-left_x-small slds-hide" role="tabpanel" aria-labelledby="vegetable_linking">
+        
+<!--lightning:listView 
+    objectApiName="Task"
+    listName="OverdueTasks"
+    rows="5"
+    showSearchBar="false"
+    showActionBar="false"
+    enableInlineEdit="true"
+    showRowLevelActions="false"
+/-->
+           <aura:iteration items="{!v.todaytasklist}" var="item">
+          <div class="demo-only slds-m-top_small">
+  <article class="slds-tile slds-size_1-of-1 slds-border_bottom">
+    <h3 class="slds-tile__title slds-truncate" title="Salesforce UX">
+        {!item.OwnerId.Name}
+        <a href="{!'/lightning/r/Task/'+item.Id+'/view'}" target="_blank">{!item.Subject}</a>
+    </h3>
+    <div class="slds-tile__detail">
+      <dl class="slds-list_horizontal slds-wrap">
+        <dt class="slds-item_label slds-text-color_weak slds-truncate" title="First Label"><a href="{!'lightning/r/User/'+item.AccountId+'/view'}" target="_blank">{!item.Account.Name}</a></dt>
+        <!--dd class="slds-item_detail slds-truncate" title="Description for first label">Description for first label</dd-->
+        <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Second Label"><a href="{!'/lightning/r/Task/'+item.OwnerId+'/view'}" target="_blank">{!item.Owner.Name}</a></dt>
+        <!--dd class="slds-item_detail slds-truncate" title="Description for second label">Description for second label</dd-->
+      </dl>
+    </div>
+  </article>
+</div>
+          </aura:iteration>
+         
+      </div>
+      <div aura:id="CompletedTabDataId" id="tab-default-3" class=" slds-p-left_x-small slds-hide" role="tabpanel" aria-labelledby="color_linking">
+        
+<!--lightning:listView 
+    objectApiName="Task"
+    listName="CompletedTasks"
+    rows="5"
+    showSearchBar="true"
+    showActionBar="true"
+    enableInlineEdit="true"
+    showRowLevelActions="true"
+/-->
+          <div>
+           <aura:iteration items="{!v.todaytasklist}" var="item">
+          <div class="demo-only slds-m-top_small">
+  <article class="slds-tile slds-size_1-of-1 slds-border_bottom">
+    <h3 class="slds-tile__title slds-truncate" title="Salesforce UX">
+        {!item.OwnerId.Name}
+        <a href="{!'/lightning/r/Task/'+item.Id+'/view'}" target="_blank">{!item.Subject}</a>
+    </h3>
+    <div class="slds-tile__detail">
+      <dl class="slds-list_horizontal slds-wrap">
+          <dt class="slds-item_label slds-text-color_weak slds-truncate" title="First Label"><a href="{!'/lightning/r/Account/'+item.AccountId+'/view'}" target="_blank">{!item.Account.Name}</a></dt>
+        <!--dd class="slds-item_detail slds-truncate" title="Description for first label">Description for first label</dd-->
+        <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Second Label"><a href="{!'/lightning/r/User/'+item.OwnerId+'/view'}" target="_blank">{!item.Owner.Name}</a></dt>
+        <!--dd class="slds-item_detail slds-truncate" title="Description for second label">Description for second label</dd-->
+      </dl>
+    </div>
+  </article>
+</div>
+          </aura:iteration>
+         </div>
+      </div>
+        <div class="slds-align--absolute-center slds-m-top_small">  
+            <lightning:button onclick="{!c.onPrev}" disabled="{! v.pageNumber == 1|| v.pageNumber == 0}" >
+       <lightning:icon iconName="utility:chevronleft"/>
+                </lightning:button>
+       <div class="slds-badge slds-badge_lightest slds-m-horizontal_small ">
+       Page {!v.pageNumber} of {!v.totalPages}
+       </div>          
+              <lightning:button onclick="{!c.onNext}" disabled="{!v.isLastPage}">
+       <lightning:icon iconName="utility:chevronright"/> 
+            </lightning:button>
+    </div>
+    </div>
+   
+    </div>
+
+    
+      
+      
+   
+ 
+  <!--/div -->
+</aura:component>
